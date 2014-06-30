@@ -607,6 +607,8 @@ function ElkBuffBar:OnUpdate(elapsed)
 				end
 				duration:SetText(time)
 				duration:Show()
+			elseif button.name == "Stalker's Ally" then
+				duration:Hide()
 			else
 				duration:Hide()
 			end
