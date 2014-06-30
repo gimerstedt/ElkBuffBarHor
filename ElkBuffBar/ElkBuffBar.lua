@@ -69,6 +69,8 @@ function ElkBuffBar:InitSettings()
 				["spacing"]	= 0,
 				["group"]	= 5,
 				["dbcolor"]	= true,
+				["flashing"]= true,
+				["colorAlpha"]	= 1,
 			}
 		end
 		if not ElkBuffBarOptions.width then ElkBuffBarOptions.width = 40 end
@@ -82,6 +84,8 @@ function ElkBuffBar:InitSettings()
 		if not ElkBuffBarOptions.spacing then ElkBuffBarOptions.spacing = 0 end
 		if not ElkBuffBarOptions.group then ElkBuffBarOptions.group = 5 end
 		if not ElkBuffBarOptions.dbcolor then ElkBuffBarOptions.dbcolor = true end
+		if not ElkBuffBarOptions.flashing then ElkBuffBarOptions.flashing = true end
+		if not ElkBuffBarOptions.colorAlpha then ElkBuffBarOptions.colorAlpha = 1 end
 		if not ElkBuffBarOptions.x then ElkBuffBarOptions.x = floor(GetScreenWidth() * .5 / (GetCVar("uiscale") * ElkBuffBarOptions.scale)) end
 		if not ElkBuffBarOptions.y then ElkBuffBarOptions.y = floor(GetScreenHeight() * .5 / (GetCVar("uiscale") * ElkBuffBarOptions.scale)) end
 		self:UpdateLayout()
@@ -314,15 +318,12 @@ function ElkBuffBar:SetBuffButtonBuff(buttonid, id, buffname, timeleft, timemax,
 	button.untilCancelled = cancel
 	
 	if ElkBuffBarColors[category] ~= nil then
-		button:SetBackdropColor(ElkBuffBarColors[category].r,ElkBuffBarColors[category].g,ElkBuffBarColors[category].b,1)
+		button:SetBackdropColor(ElkBuffBarColors[category].r,ElkBuffBarColors[category].g,ElkBuffBarColors[category].b,ElkBuffBarOptions.colorAlpha)
 		bar:SetStatusBarColor(ElkBuffBarColors[category].r,ElkBuffBarColors[category].g,ElkBuffBarColors[category].b,0.8)
 	else
-		button:SetBackdropColor(0.5,0.5,0.5,1)
+		button:SetBackdropColor(0.5,0.5,0.5,ElkBuffBarOptions.colorAlpha)
 		bar:SetStatusBarColor(0,0,0,0.8)
 	end
-
-	--button:SetBackdropColor(0.5,0.5,0.5,0.0)
-	--bar:SetStatusBarColor(0,0,0,0.0)
 
 	icon:SetTexture(GetPlayerBuffTexture(id))
 
@@ -359,7 +360,7 @@ function ElkBuffBar:SetBuffButtonDebuff(buttonid, id, buffname, timeleft, timema
 	button.type = "DEBUFF"
 	button.id = id
 	button.untilCancelled = cancel
-	button:SetBackdropColor(1, 0, 0, 1)
+	button:SetBackdropColor(1, 0, 0, ElkBuffBarOptions.colorAlpha)
 	icon:SetTexture(GetPlayerBuffTexture(id))
 
 	button.timeleft = timeleft
@@ -409,7 +410,7 @@ function ElkBuffBar:SetBuffButtonWeapon(buttonid, id, buffname, timeleft, timema
 	button.type = "WEAPON"
 	button.id = id
 	button.untilCancelled = 0
-	button:SetBackdropColor(0.5, 0, 0.5, 1)
+	button:SetBackdropColor(0.5, 0, 0.5, ElkBuffBarOptions.colorAlpha)
 	bar:SetStatusBarColor(0.5, 0, 0.5, 1)
 	icon:SetTexture(GetInventoryItemTexture("player", id))
 
@@ -569,7 +570,9 @@ function ElkBuffBar:OnUpdate(elapsed)
 				end
 			end
 			if ( timeleft < BUFF_WARNING_TIME ) then
-				button:SetAlpha(self.BuffAlphaValue)
+				if (button.name ~= "Stalker's Ally" and ElkBuffBarOptions.flashing) then
+					button:SetAlpha(self.BuffAlphaValue)
+				end
 			else
 				button:SetAlpha(self.frame:GetAlpha())
 			end
@@ -847,7 +850,11 @@ function ElkBuffBar:UpdateButtonPosition(buttonid, space)
 		if (ElkBuffBarOptions.invert) then
 			button:SetPoint("LEFT", getglobal("ElkBuffButton"..(buttonid-1)), "RIGHT", space, 0) --bottom/top 0/space
 		else
-			button:SetPoint("RIGHT", getglobal("ElkBuffButton"..(buttonid-1)), "LEFT", -space, 0) --top/bottom 0/-space
+			if button.type == "DEBUFF" then
+				button:SetPoint("RIGHT", getglobal("ElkBuffButton"..(buttonid-1)), "LEFT", -space, 0) --top/bottom 0/-space
+			else
+				button:SetPoint("RIGHT", getglobal("ElkBuffButton"..(buttonid-1)), "LEFT", -space, 0) --top/bottom 0/-space
+			end
 		end
 	else
 		if (ElkBuffBarOptions.invert) then
@@ -908,19 +915,21 @@ function ElkBuffBar:SlashCommandHandler(msg)
 		DEFAULT_CHAT_FRAME:AddMessage("|cffffff00[ElkBuffBar]|r command line options:")
 		DEFAULT_CHAT_FRAME:AddMessage(" - reset : resets all values to default")
 		DEFAULT_CHAT_FRAME:AddMessage(" - resetpos : resets position and scale to default")
-		DEFAULT_CHAT_FRAME:AddMessage(" - width [100+] : sets the button's width (is |cffff0000"..ElkBuffBarOptions.width.."|r)")
-		DEFAULT_CHAT_FRAME:AddMessage(" - height [10+] : sets the button's height (is |cffff0000"..ElkBuffBarOptions.height.."|r)")
+		--DEFAULT_CHAT_FRAME:AddMessage(" - width [100+] : sets the button's width (is |cffff0000"..ElkBuffBarOptions.width.."|r)")
+		--DEFAULT_CHAT_FRAME:AddMessage(" - height [10+] : sets the button's height (is |cffff0000"..ElkBuffBarOptions.height.."|r)")
 		DEFAULT_CHAT_FRAME:AddMessage(" - scale [0.0+] : sets the button's scale (is |cffff0000"..ElkBuffBarOptions.scale.."|r)")
-		DEFAULT_CHAT_FRAME:AddMessage(" - anchor [TOPLEFT/-RIGHT/BOTTOMLEFT/-RIGHT] : sets anchor (is |cffff0000"..ElkBuffBarOptions.anchor.."|r)")
+		--DEFAULT_CHAT_FRAME:AddMessage(" - anchor [TOPLEFT/-RIGHT/BOTTOMLEFT/-RIGHT] : sets anchor (is |cffff0000"..ElkBuffBarOptions.anchor.."|r)")
 		DEFAULT_CHAT_FRAME:AddMessage(" - locked [TRUE/FALSE] : toggles locked state (is |cffff0000"..(ElkBuffBarOptions.locked and "TRUE" or "FALSE").."|r)")
 		DEFAULT_CHAT_FRAME:AddMessage(" - alpha [0.0-1.0] : sets the button's alpha value (is |cffff0000"..ElkBuffBarOptions.alpha.."|r)")
-		DEFAULT_CHAT_FRAME:AddMessage(" - icon [LEFT/RIGHT/NONE] : sets the icon positions (is |cffff0000"..ElkBuffBarOptions.icon.."|r)")
+		--DEFAULT_CHAT_FRAME:AddMessage(" - icon [LEFT/RIGHT/NONE] : sets the icon positions (is |cffff0000"..ElkBuffBarOptions.icon.."|r)")
 		DEFAULT_CHAT_FRAME:AddMessage(" - sort [DEFAULT/TIMEMAX/TIMELEFT/TIMELEFTCATEGORY] : sets the sort style (is |cffff0000"..ElkBuffBarOptions.sort.."|r)")
 		DEFAULT_CHAT_FRAME:AddMessage(" - timer [DEFAULT/NONE/FULL] : sets the timer style (is |cffff0000"..ElkBuffBarOptions.timer.."|r)")
 		DEFAULT_CHAT_FRAME:AddMessage(" - invert [TRUE/FALSE] : toggles inverting of buffs (is |cffff0000"..(ElkBuffBarOptions.invert and "TRUE" or "FALSE").."|r)")
 		DEFAULT_CHAT_FRAME:AddMessage(" - spacing [0+] : set space between bars (is |cffff0000"..ElkBuffBarOptions.spacing.."|r)")
 		DEFAULT_CHAT_FRAME:AddMessage(" - group [0+] : set additionsl space between the buff groups (is |cffff0000"..ElkBuffBarOptions.group.."|r)")
 		DEFAULT_CHAT_FRAME:AddMessage(" - dbcolor [TRUE/FALSE] : toggles type colored debuffs (is |cffff0000"..(ElkBuffBarOptions.dbcolor and "TRUE" or "FALSE").."|r)")
+		DEFAULT_CHAT_FRAME:AddMessage(" - flashing [TRUE/FALSE] : toggles flashing of buffs with low time left (is |cffff0000"..(ElkBuffBarOptions.flashing and "TRUE" or "FALSE").."|r)")
+		DEFAULT_CHAT_FRAME:AddMessage(" - coloralpha [0.0-1.0] : sets the color's alpha value (is |cffff0000"..ElkBuffBarOptions.colorAlpha.."|r)")
 	elseif carg1 == "reset" then
 		ElkBuffBarOptions = nil
 		self:InitSettings()
@@ -1109,6 +1118,37 @@ function ElkBuffBar:SlashCommandHandler(msg)
 			end
 		else
 			DEFAULT_CHAT_FRAME:AddMessage("|cffffff00[ElkBuffBar]|r DBCOLOR is |cffff0000"..(ElkBuffBarOptions.dbcolor and "TRUE" or "FALSE").."|r")
+		end
+	elseif carg1 == "flashing" then
+		if carg2 then
+			carg2 = string.lower(carg2)
+			if carg2 ~= "true" and carg2 ~= "false" then
+				DEFAULT_CHAT_FRAME:AddMessage("|cffffff00[ElkBuffBar]|r FLASHING must be TRUE or FALSE")
+			else
+				if carg2 == "true" then
+					ElkBuffBarOptions.flashing = true
+				else
+					ElkBuffBarOptions.flashing = nil
+				end
+				self:UpdateLayout()
+				DEFAULT_CHAT_FRAME:AddMessage("|cffffff00[ElkBuffBar]|r FLASHING now set to |cffff0000"..(ElkBuffBarOptions.flashing and "TRUE" or "FALSE").."|r")
+			end
+		else
+			DEFAULT_CHAT_FRAME:AddMessage("|cffffff00[ElkBuffBar]|r FLASHING is |cffff0000"..(ElkBuffBarOptions.flashing and "TRUE" or "FALSE").."|r")
+		end
+	elseif carg1 == "coloralpha" then
+		if carg2 then
+			carg2 = tonumber(carg2)
+			if carg2 < 0 or carg2 > 1 then
+				DEFAULT_CHAT_FRAME:AddMessage("|cffffff00[ElkBuffBar]|r COLORALPHA must be >= 0.0 and <= 1.0")
+			else
+				ElkBuffBarOptions.colorAlpha = carg2
+				self:UpdateLayout()
+				DEFAULT_CHAT_FRAME:AddMessage("|cffffff00[ElkBuffBar]|r COLORALPHA now set to |cffff0000"..ElkBuffBarOptions.colorAlpha.."|r - Reloading UI is required for setting to take effect.")
+			end
+			self:UpdateLayout()
+		else
+			DEFAULT_CHAT_FRAME:AddMessage("|cffffff00[ElkBuffBar]|r COLORALPHA is |cffff0000"..ElkBuffBarOptions.colorAlpha.."|r")
 		end
 	else
 		DEFAULT_CHAT_FRAME:AddMessage("|cffffff00[ElkBuffBar]|r "..carg1.." is no valid parameter.")

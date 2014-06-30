@@ -3,7 +3,7 @@ ElkBuffBarColors = {
 	[0]		= {r=0.1,g=0.1,b=0.1};
 	-- flasks
 	[1]		= {r=0.9,g=0.5,b=0.5};
-	-- world buffs
+	-- special buffs
 	[2]		= {r=0.5,g=0.5,b=0.9};
 	-- class colors
 	[21]	= {r=0.78,g=0.61,b=0.43};
@@ -34,7 +34,7 @@ ElkBuffBarColors = {
 ElkBuffBarData = {
 	-- untilCancelled buffs (auras, mount, blood pact etc.)
 	[0] = {
-		-- useless items
+		-- item auras
 		"Argent Dawn Commission",
 		"Ashbringer",
 		-- mounts
@@ -113,10 +113,6 @@ ElkBuffBarData = {
 		"Concentration Aura",
 		"Divine Favor",
 		-- hunter
-		"Aspect of the Beast",
-		"Aspect of the Cheeta",
-		"Aspect of the Hawk",
-		"Aspect of the Monkey",
 		"Aspect of the Pack",
 		"Aspect of the Wild",
 		"Trueshot Aura",
@@ -141,7 +137,7 @@ ElkBuffBarData = {
 		"Distilled Wisdom",
 		"Supreme Power",
 	};
-	-- World buffs (head/heart/dm north/dmf/zanza)
+	-- Special buffs (head/heart/dm north/dmf/zanza)
 	[2] = {
 		"Sayge's Dark Fortune of Damage",
 		"Sayge's Dark Fortune of Resistance",
@@ -159,6 +155,11 @@ ElkBuffBarData = {
 		"Spirit of Zanza",
 		"Sheen of Zanza",
 		"Swiftness of Zanza",
+		"Strike of the Scorpok",
+		"Spiritual Domination",
+		"Spirit of the Boar",
+		"Rage of Ages",
+		"Infallible Mind",
 	};
 	-- Protection potions (gspp, gfpp, gnpp, gfpp, gapp, gsp)
 	[50] = {
@@ -254,6 +255,7 @@ ElkBuffBarData = {
 		"Aegis of Preservation",
 		"Arcane Infused",
 		"Badge of the Swarmguard",
+		"Insight of the Qiraji",
 		"Gift of Life",
 		"Mind Quickening",
 		"Nature Aligned",
@@ -358,6 +360,12 @@ ElkBuffBarData = {
 		"Deterrence",
 		"Rapid Fire",
 		"Eagle Eye",
+		"Aspect of the Beast",
+		"Aspect of the Cheetah",
+		"Aspect of the Hawk",
+		"Aspect of the Monkey",
+		"Stalker's Ally",
+		"Spirit Bond",
 	};
 	-- Rogue
 	[24] = {
