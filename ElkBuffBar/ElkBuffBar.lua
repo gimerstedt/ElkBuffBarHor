@@ -50,6 +50,7 @@ function ElkBuffBar:OnEvent()
 	elseif event == "PLAYER_AURAS_CHANGED" then
 		self:UpdateBuffs()
 		self:UpdateLayout()
+		self:UpdateNumberOfBuffs()
 	end
 end
 
@@ -189,6 +190,8 @@ function ElkBuffBar:UpdateBuffs()
 	local buffIndex, untilCancelled
 	local category = 1
 	local i = 0
+	numBuffs = numBuffs +1
+	self:SetBuffButtonCounter(numBuffs, "Counter")
 	while true do
 		buffIndex, untilCancelled = GetPlayerBuff(i, "HELPFUL")
 		if buffIndex < 0 then break end
@@ -316,9 +319,16 @@ function ElkBuffBar:SetBuffButtonBuff(buttonid, id, buffname, timeleft, timemax,
 	button.type = category
 	button.id = id
 	button.untilCancelled = cancel
-	
+
+	local colorAlpha
+	if button.untilCancelled == 1 then
+		colorAlpha = 0
+	else
+		colorAlpha = ElkBuffBarOptions.colorAlpha
+	end
+		
 	if ElkBuffBarColors[category] ~= nil then
-		button:SetBackdropColor(ElkBuffBarColors[category].r,ElkBuffBarColors[category].g,ElkBuffBarColors[category].b,ElkBuffBarOptions.colorAlpha)
+		button:SetBackdropColor(ElkBuffBarColors[category].r,ElkBuffBarColors[category].g,ElkBuffBarColors[category].b,colorAlpha)
 		bar:SetStatusBarColor(ElkBuffBarColors[category].r,ElkBuffBarColors[category].g,ElkBuffBarColors[category].b,0.8)
 	else
 		button:SetBackdropColor(0.5,0.5,0.5,ElkBuffBarOptions.colorAlpha)
@@ -429,6 +439,37 @@ function ElkBuffBar:SetBuffButtonWeapon(buttonid, id, buffname, timeleft, timema
 	end
 	debuff:Hide()
 	tench:Show()
+	button:Show()
+end
+
+function ElkBuffBar:SetBuffButtonCounter(buttonid, buffname)
+	self:CreateButtons(buttonid)
+	local button = getglobal("ElkBuffButton"..buttonid)
+	local bar = getglobal("ElkBuffButton"..buttonid.."TimeBar")
+	local icon = getglobal("ElkBuffButton"..buttonid.."Icon")
+	local name = getglobal("ElkBuffButton"..buttonid.."DescribeText")
+	local buffCount = getglobal("ElkBuffButton"..buttonid.."Count")
+	local duration = getglobal("ElkBuffButton"..buttonid.."DurationText")
+	local debuff = getglobal("ElkBuffButton"..buttonid.."DebuffBorder")
+	local tench = getglobal("ElkBuffButton"..buttonid.."TEnchBorder")
+
+	button:SetAlpha(self.frame:GetAlpha())
+	button.type = 0
+	button.untilCancelled = 1
+	
+	button:SetBackdropColor(ElkBuffBarColors[0].r,ElkBuffBarColors[0].g,ElkBuffBarColors[0].b,0)
+
+	--icon:SetTexture("Interface\\Icons\\Ability_Warrior_BattleShout")
+
+	--button.timeleft = timeleft
+	--button.maxtime = timemax
+	--bar:SetMinMaxValues(0, button.maxtime)
+
+	button.name = buffname or "Buff "..id
+	
+	buffCount:Hide()
+	debuff:Hide()
+	tench:Hide()
 	button:Show()
 end
 
@@ -619,8 +660,16 @@ function ElkBuffBar:OnUpdate(elapsed)
 			end
 			button.timeleft = timeleft
 		else
-			duration:Hide()
-			bar:Hide()
+			if button.name == "Counter" then
+				--duration:SetPoint("TOPRIGHT",0,0)
+				--duration:SetFont("Fonts\\FRIZQT__.TTF", 30)
+				--duration:SetText(self.numBuffsShown-1)
+				duration:Show()
+				bar:Hide()
+			else
+				duration:Hide()
+				bar:Hide()
+			end
 		end
 	end
 
@@ -637,7 +686,7 @@ function ElkBuffBar:OnUpdate(elapsed)
 end
 
 function ElkBuffBar:ButtonOnEnter()
-	if this.type == "DEBUFF" or type(this.type) == "number" then
+	if (this.type == "DEBUFF" or type(this.type) == "number") and this.name ~= "Counter" then
 		GameTooltip:SetOwner(this, "ANCHOR_BOTTOMLEFT")
 		GameTooltip:SetPlayerBuff(this.id)
 	elseif this.type == "WEAPON" then
@@ -904,6 +953,35 @@ function ElkBuffBar:UpdateButtonPositions(onlywidth)
 	end
 end
 
+function ElkBuffBar:UpdateNumberOfBuffs()
+	local numBuffs = 0
+	local buffIndex, untilCancelled
+	local i = 0
+	
+	while true do
+		buffIndex, untilCancelled = GetPlayerBuff(i, "HELPFUL")
+		if buffIndex < 0 then break end
+		i = i + 1
+	end
+	
+	if i > 31 then
+		ElkBuffButton1DurationText:SetTextColor(1,0,0);
+	elseif i > 28 then
+		ElkBuffButton1DurationText:SetTextColor(1,1,0);
+	elseif i > 19 then
+		ElkBuffButton1DurationText:SetTextColor(0,1,0);
+	else
+		ElkBuffButton1DurationText:SetTextColor(1,1,1);
+	end
+	ElkBuffButton1DurationText:SetText(i);
+	if ElkBuffBarOptions.invert then
+		ElkBuffButton1DurationText:SetPoint("TOPLEFT",-60,10)
+	else
+		ElkBuffButton1DurationText:SetPoint("TOPLEFT",-40,10)
+	end
+	ElkBuffButton1DurationText:SetFont("Fonts\\FRIZQT__.TTF", 40, "OUTLINE")
+end
+
 function ElkBuffBar:SlashCommandHandler(msg)
 	local _, _, carg1, carg2 = string.find(msg, "^([^ ]+)$")
 	if not carg1 then
@@ -1073,6 +1151,7 @@ function ElkBuffBar:SlashCommandHandler(msg)
 					ElkBuffBarOptions.invert = nil
 				end
 				self:UpdateLayout()
+				self:UpdateNumberOfBuffs()
 				DEFAULT_CHAT_FRAME:AddMessage("|cffffff00[ElkBuffBar]|r INVERT now set to |cffff0000"..(ElkBuffBarOptions.invert and "TRUE" or "FALSE").."|r")
 			end
 		else

@@ -25,6 +25,7 @@ Notes:
 Tries to sort buffs into categories with pretty colors. Fails sometimes.
 Fucks over most of the addon completely but if you don't change stuff around...maybe
 Horizontal Predictable version.
+Screenshot: http://i.imgur.com/aQUJUDx.jpg
 
 
 Changes:
