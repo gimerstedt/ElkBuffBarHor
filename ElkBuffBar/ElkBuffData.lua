@@ -180,14 +180,14 @@ ElkBuffBarData = {
 		"Elixir of the Mongoose",
 		"Health II",
 		"Elixir of the Sages",
-		"Elixir of Giants",
+		"Elixir of the Giants",
 		"Juju Power",
 		"Juju Might",
 		"Juju Flurry",
 		"Juju Guile",
 		"Greater Armor", -- elixir of sup def
-		"Mageblood Potion",
-		"Elixir of Shadow Power",
+		"Mageblood Potion", -- actually not working "Mana Regeneration", same as mp5 food so sorted as food atm
+		"Shadow Power",
 		"Arcane Elixir",
 		"Elixir of Brute Force",
 		"Elixir of Demonslaying",
