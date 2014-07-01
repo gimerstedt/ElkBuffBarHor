@@ -844,7 +844,11 @@ end
 function ElkBuffBar:UpdateButtonWidth(buttonid)
 	local button = getglobal("ElkBuffButton"..buttonid)
 	local icon = getglobal("ElkBuffButton"..buttonid.."Icon")
-	button:SetWidth(ElkBuffBarOptions.width)
+	if button.name == "Counter" then
+		button:SetWidth(ElkBuffBarOptions.width+200)
+	else
+		button:SetWidth(ElkBuffBarOptions.width)
+	end
 	icon:SetWidth(ElkBuffBarOptions.height)
 	icon:SetHeight(ElkBuffBarOptions.height)
 	self:UpdateButtonIcon(buttonid)
@@ -974,10 +978,13 @@ function ElkBuffBar:UpdateNumberOfBuffs()
 		ElkBuffButton1DurationText:SetTextColor(1,1,1);
 	end
 	ElkBuffButton1DurationText:SetText(i);
+	ElkBuffButton1:SetWidth(ElkBuffBarOptions.width+20)
 	if ElkBuffBarOptions.invert then
-		ElkBuffButton1DurationText:SetPoint("TOPLEFT",-60,10)
+		ElkBuffButton1DurationText:SetPoint("TOPRIGHT",ElkBuffButton1,"TOPRIGHT",0,10)
+		ElkBuffButton1DurationText:SetJustifyH("RIGHT")
 	else
-		ElkBuffButton1DurationText:SetPoint("TOPLEFT",-40,10)
+		ElkBuffButton1DurationText:SetPoint("TOPLEFT",ElkBuffButton1,"TOPLEFT",0,10)
+		ElkBuffButton1DurationText:SetJustifyH("LEFT")
 	end
 	ElkBuffButton1DurationText:SetFont("Fonts\\FRIZQT__.TTF", 40, "OUTLINE")
 end
