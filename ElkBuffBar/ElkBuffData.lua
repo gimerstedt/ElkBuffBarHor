@@ -149,7 +149,7 @@ ElkBuffBarData = {
 		"Sayge's Dark Fortune of Agility",
 		"Rallying Cry of the Dragonslayer",
 		"Spirit of Zandalar",
-		"Fengus's Ferocity",
+		"Fengus Ferocity",
 		"Mol'dar's Moxie",
 		"Slip'kik's Savvy",
 		"Spirit of Zanza",
